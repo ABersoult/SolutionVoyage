@@ -1,0 +1,106 @@
+﻿ù<Window x:Class="VoyageVoyage.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VoyageVoyage"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:Convertion x:Key="SelectionToIsEnabledConverter"/>
+        <local:Validation x:Key="ValeurValidationRule"/>
+        <local:ValidationPrix x:Key="ValidationPrix"/>
+        <ControlTemplate x:Key="validationTemp">
+            <DockPanel>
+                <AdornedElementPlaceholder/>
+                <TextBlock Foreground="Red" FontWeight="Bold" FontSize="24"/>
+            </DockPanel>
+        </ControlTemplate>
+        <Style x:Key="validationErreur">
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="Panel.Background" Value="Red"/>
+                    <Setter Property="FrameworkElement.ToolTip" Value="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <DataTemplate x:Key="VoyageDataTemplate">
+            <StackPanel Orientation="Horizontal" Margin="5">
+                <Image Source="{Binding UrlDrapeau}" Width="50" Height="30" ToolTip="{Binding Nom}"/>
+                <TextBlock Text="{Binding Nom}" Margin="10,0" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Notation}" Value="5">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="Foreground" Value="Red"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Notation}" Value="4">
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ProgressBar Value="{Binding Notation}" Maximum="5" Width="100" Height="20" Margin="10,0"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <ListBox x:Name="ListBoxPays" Background="#FF0A37AE" HorizontalAlignment="Left" Width="270" Margin="0,0,0,108" ItemsSource="{Binding}" ItemTemplate="{StaticResource VoyageDataTemplate}"/>
+        <GroupBox x:Name="GroupeBoxDescriptionPays" Header="Informations voyage" Margin="296,0,0,31" Background="#FFE90000" DataContext="{Binding SelectedItem,ElementName=ListBoxPays,Mode=TwoWay}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="89*"/>
+                    <ColumnDefinition Width="157*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40*"/>
+                    <RowDefinition Height="56*"/>
+                    <RowDefinition Height="39*"/>
+                    <RowDefinition Height="74*"/>
+                    <RowDefinition Height="52*"/>
+                    <RowDefinition Height="48*"/>
+                    <RowDefinition Height="53*"/>
+                    <RowDefinition Height="49*"/>
+                </Grid.RowDefinitions>
+                <Label Content="Nom :" Margin="26,0,106,0" VerticalAlignment="Center" Height="26"/>
+                <Label Content="Pays : " Margin="24,13,116,10" Grid.Row="1"/>
+                <Label Content="URL drapeau :" Margin="24,3,66,5" Grid.Row="2"/>
+                <Label Content="Description :" Margin="24,22,76,22" Grid.Row="3" RenderTransformOrigin="1.351,1.092"/>
+                <Label Content="Date de prochain départ :" Margin="24,10,5,13" Grid.Row="4"/>
+                <Label Content="Nombre de jours :" Margin="24,5,46,8" Grid.Row="5"/>
+                <Label Content="Prix :" Margin="24,10,116,13" Grid.Row="6"/>
+                <Label Content="Indice de satisfaction (0 à 5) :" HorizontalAlignment="Left" Margin="9,8,0,10" Grid.Row="7" Width="164"/>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" Text="{Binding Nom,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Height="26" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" Text="{Binding Pays,UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Height="31" Grid.Row="1" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" Text="{Binding UrlDrapeau}" VerticalAlignment="Center" Height="27" Grid.Row="2" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" Text="{Binding Details}" VerticalAlignment="Center" Height="52" Grid.Row="3" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" Text="{Binding ProchaineDate,StringFormat=d}" VerticalAlignment="Center" Height="28" Grid.Row="4" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,10,10,10" TextWrapping="Wrap" Text="{Binding NbJours}" Grid.Row="5" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}"/>
+                <TextBox Margin="6,13,10,12" TextWrapping="Wrap" Grid.Row="6" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}" Validation.ErrorTemplate="{StaticResource validationTemp}" Style="{StaticResource validationErreur}">
+                    <TextBox.Text>
+                        <Binding Path="Prix" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True">
+                            <Binding.ValidationRules>
+                                <local:ValidationPrix/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <TextBox Margin="6,0,10,0" TextWrapping="Wrap" VerticalAlignment="Center" Height="28" Grid.Row="7" Grid.Column="1" IsEnabled="{Binding Converter={StaticResource SelectionToIsEnabledConverter}}" Validation.ErrorTemplate="{StaticResource validationTemp}" Style="{StaticResource validationErreur}">
+                    <TextBox.Text>
+                        <Binding Path="Notation" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True">
+                            <Binding.ValidationRules>
+                                <local:Validation/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
+        </GroupBox>
+        <Slider x:Name="NbreSlider" Margin="22,403,22,13" Maximum="50" Value="25" Background="#FFC5D6CF"/>
+    </Grid>
+</Window>

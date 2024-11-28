@@ -1,0 +1,12 @@
+ public void NotifyPropertyChanged(string propertyName)
+        {
+            try
+            {
+                if (PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
